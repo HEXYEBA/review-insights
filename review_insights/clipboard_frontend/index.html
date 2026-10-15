@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+*{box-sizing:border-box}body{margin:0;font:14px 'Segoe UI',sans-serif;color:#454552;background:transparent}
+.controls{display:flex;align-items:center;gap:9px;flex-wrap:wrap;padding:3px}
+button{font:600 14px 'Segoe UI',sans-serif;cursor:pointer;border:1px solid #ddd4ff;background:#f1edff;color:#6545d3;border-radius:10px;min-height:40px;padding:8px 15px;transition:background .18s,transform .18s}
+button:hover{background:#e9e1ff;transform:translateY(-1px)}button:active{transform:none}button:focus-visible{outline:3px solid #b9aaff;outline-offset:2px}
+#clear{color:#656577;background:#fff;border-color:#e1e1ea}button:disabled{opacity:.6;cursor:wait}
+#status{font-size:12px;line-height:1.6;margin:5px 3px 1px;color:#656577;overflow-wrap:anywhere}#status.error{color:#9c503e}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style></head><body>
+<div class="controls"><button id="paste" type="button">Вставить ссылку</button><button id="clear" type="button">Очистить</button></div>
+<div id="status" role="status" aria-live="polite"></div>
+<script>
+const status=document.getElementById('status'), paste=document.getElementById('paste');
+let serial=0;
+function send(type, extra={}){parent.postMessage({isStreamlitMessage:true,type,...extra},window.location.origin)}
+function resize(){send('streamlit:setFrameHeight',{height:Math.ceil(document.body.scrollHeight)+4})}
+function message(text,error=false){status.textContent=text;status.className=error?'error':'';resize()}
+function action(action,value=''){send('streamlit:setComponentValue',{value:{action,value,nonce:Date.now()+':'+(++serial)},dataType:'json'})}
+function isCardLink(text){
+  if(!text||text.length>2048||/[\u0000-\u001f]/.test(text))return false;
+  try{const u=new URL(text);return u.protocol==='https:'&&['yandex.ru','www.yandex.ru','yandex.com','www.yandex.com'].includes(u.hostname)&&!u.username&&!u.password&&!u.port&&/^\/maps\/org\/[^/]+\/[0-9]{1,20}(?:\/.*)?$/.test(u.pathname)}catch{return false}
+}
+paste.addEventListener('click',async()=>{
+  paste.disabled=true;
+  try{
+    if(!navigator.clipboard?.readText)throw new Error('clipboard unavailable');
+    const text=(await navigator.clipboard.readText()).trim();
+    if(!isCardLink(text)){message('Не вставлено: в буфере нет полной ссылки на Яндекс Карты. На странице карточки нажмите Ctrl+L, затем Ctrl+C.',true);return}
+    action('paste',text);message('Ссылка вставлена целиком.');
+  }catch{
+    message('Браузер не разрешил чтение буфера. Скопируйте адрес карточки (Ctrl+L, Ctrl+C), нажмите на поле и вставьте через Ctrl+V.',true);
+  }finally{paste.disabled=false;resize()}
+});
+document.getElementById('clear').addEventListener('click',()=>{action('clear');message('Поле очищено.')});
+window.addEventListener('message',event=>{if(event.source===parent&&event.data?.type==='streamlit:render')resize()});
+send('streamlit:componentReady',{apiVersion:1});
+new ResizeObserver(resize).observe(document.body);resize();
+</script></body></html>

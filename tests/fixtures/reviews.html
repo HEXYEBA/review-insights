@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="ru">
+  <head><meta charset="utf-8"></head>
+  <body>
+    <h1 class="orgpage-header-view__header">Тестовое кафе</h1>
+    <meta itemprop="reviewCount" content="3">
+    <meta itemprop="ratingCount" content="10">
+    <meta itemprop="ratingValue" content="4.2">
+    <div class="rating-ranking-view">
+      <button id="current-ranking" type="button">По умолчанию</button>
+    </div>
+    <div id="ranking-menu" style="display:none">
+      <button id="newest-ranking" type="button">По новизне</button>
+    </div>
+    <div class="scroll__container" style="height:300px;overflow:auto">
+      <div class="business-review-view">
+        <meta itemprop="ratingValue" content="5.0">
+        <meta itemprop="datePublished" content="2026-10-01T10:00:00Z">
+        <span class="business-review-view__date">1 октября</span>
+        <div class="business-review-view__body" itemprop="reviewBody">
+          <span class="spoiler-view__text-container">Кофе вкусный. Персонал вежливый.</span>
+        </div>
+      </div>
+      <div class="business-review-view">
+        <meta itemprop="ratingValue" content="1.0">
+        <meta itemprop="datePublished" content="2026-09-30T12:30:00+03:00">
+        <span class="business-review-view__date">30 сентября</span>
+        <div class="business-review-view__body" itemprop="reviewBody">
+          <span class="spoiler-view__text-container">Кофе...</span>
+          <button class="business-review-view__expand" type="button">Ещё</button>
+        </div>
+      </div>
+      <div class="business-review-view">
+        <meta itemprop="ratingValue" content="4.0">
+        <meta itemprop="datePublished" content="invalid-date">
+        <span class="business-review-view__date">давно</span>
+        <div class="business-review-view__body" itemprop="reviewBody">
+          <span class="spoiler-view__text-container">Спокойное место.</span>
+        </div>
+      </div>
+    </div>
+    <script>
+      document.querySelector(".rating-ranking-view").addEventListener("click", () => {
+        document.querySelector("#ranking-menu").style.display = "block";
+      });
+      document.querySelector("#newest-ranking").addEventListener("click", () => {
+        document.querySelector("#current-ranking").textContent = "По новизне";
+        fetch("https://yandex.ru/maps/api/business/fetchReviews?page=1&pageSize=50&ranking=by_time")
+          .then(() => setTimeout(() => {
+            document.querySelector(".business-review-view .spoiler-view__text-container")
+              .textContent = "Новые отзывы появились после ответа сервера.";
+          }, 600));
+      });
+      document.querySelectorAll(".business-review-view__expand").forEach((button) => {
+        button.addEventListener("click", () => {
+          button.parentElement.querySelector(".spoiler-view__text-container").textContent =
+            "Кофе остыл, заказ ждали слишком долго.";
+          button.remove();
+        });
+      });
+      document.querySelector(".scroll__container").addEventListener("scroll", (event) => {
+        const root = event.currentTarget;
+        if (root.scrollTop > 0 && !root.dataset.loaded) {
+          root.dataset.loaded = "yes";
+          root.insertAdjacentHTML("beforeend", `
+            <div class="business-review-view">
+              <meta itemprop="ratingValue" content="3.0">
+              <meta itemprop="datePublished" content="2026-09-29T09:00:00Z">
+              <span class="business-review-view__date">29 сентября</span>
+              <div class="business-review-view__body" itemprop="reviewBody">
+                <span class="spoiler-view__text-container">Отзыв после прокрутки.</span>
+              </div>
+            </div>`);
+        }
+      });
+    </script>
+    <a href="https://yandex.ru/maps/org/test/123/reviews/?page=2">Страница 2</a>
+    <a href="https://yandex.ru/maps/org/other/999/reviews/?page=9">Чужая организация</a>
+  </body>
+</html>

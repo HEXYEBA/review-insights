@@ -1,0 +1,24 @@
+# Allowlist: everything outside the source/test directories stays on the host.
+**
+!requirements.txt
+!app.py
+!pytest.ini
+!.streamlit/
+!.streamlit/config.toml
+!review_insights/
+!review_insights/**
+!scripts/
+!scripts/**
+!tests/
+!tests/**
+**/__pycache__
+**/*.pyc
+**/auth.json
+**/secrets.toml
+**/.env
+**/.env.*
+**/*.pem
+**/*.key
+**/*.p12
+**/*.pfx
+**/*.log

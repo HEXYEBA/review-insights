@@ -1,0 +1,22 @@
+name: hse-review-insights
+services:
+  app:
+    build: .
+    image: hse-review-insights:0.1.0
+    init: true
+    shm_size: 1gb
+    ports:
+      - "127.0.0.1:${APP_PORT:-8503}:8502"
+    environment:
+      MODEL_NAME: ${MODEL_NAME:-gpt-6.1-sol}
+      CODEX_HOME: /home/app/.codex
+      CODEX_BIN: /usr/local/bin/codex
+      ARTIFACTS_DIR: /app/artifacts
+    volumes:
+      - codex-auth:/home/app/.codex
+      - reports:/app/artifacts
+      - browser-profile:/app/.browser-profile/yandex
+volumes:
+  codex-auth:
+  reports:
+  browser-profile:

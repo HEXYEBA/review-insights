@@ -1,0 +1,4 @@
+streamlit==1.50.0
+playwright==1.56.0
+pydantic==2.12.3
+pytest==8.4.2

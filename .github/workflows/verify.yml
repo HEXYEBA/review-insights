@@ -1,0 +1,48 @@
+name: Verify container
+on:
+  push:
+    branches: [main, impl/yandex-review-mvp]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  docker:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Check Compose configuration
+        run: docker compose config --quiet
+      - name: Build without credentials
+        run: docker build -t hse-review-insights:ci .
+      - name: Tests inside the container
+        run: docker run --rm hse-review-insights:ci python -m pytest -q
+      - name: Browser and credential isolation
+        run: |
+          docker run --rm -i hse-review-insights:ci python - <<'PY'
+          import os
+          from pathlib import Path
+          from playwright.sync_api import sync_playwright
+          from review_insights.browser_runtime import open_review_context
+          assert os.getuid() != 0
+          assert not (Path(os.environ['CODEX_HOME']) / 'auth.json').exists()
+          with sync_playwright() as pw:
+              with open_review_context(pw, mode='persistent', project_root=Path('/app')) as context:
+                  page = context.new_page()
+                  page.set_content('<h1>Browser works</h1>')
+                  assert page.locator('h1').inner_text() == 'Browser works'
+          print('Non-root browser works; no baked-in Codex login.')
+          PY
+      - name: Web application health
+        run: |
+          docker run -d --name review-insights-ci -p 127.0.0.1:8503:8502 hse-review-insights:ci
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:8503/_stcore/health; then exit 0; fi
+            sleep 2
+          done
+          exit 1
+      - name: Cleanup
+        if: always()
+        run: docker rm -f review-insights-ci 2>/dev/null || true
