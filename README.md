@@ -176,6 +176,8 @@ Dockerfile, compose.yaml        Контейнерный запуск
 
 Сверка с сохранёнными требованиями курса: [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md).
 
+## Документация и результаты проверок
+
 Публикация исходного кода и исключение локальной авторизации: [безопасная загрузка в GitHub](docs/GITHUB.md).
 
 Команда `python -m pytest -q` проверяет URL, отбор, browser collector на фикстурах, процессные ограничения, проверку цитат, pipeline, Streamlit и экспорт. Текущие реальные результаты источников, модели и браузера находятся в [docs/VALIDATION.md](docs/VALIDATION.md). Короткий сценарий защиты — в [docs/DEFENSE.md](docs/DEFENSE.md).
