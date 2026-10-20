@@ -4,7 +4,7 @@
 
 Учебный проект курса **LLM Agents**, версия **0.1.0**. Защита: **22 октября 2026 года**.
 
-Проверено: 150 тестов на Windows; сборка Docker, 146 тестов Linux (4 проверки только для Windows пропущены), запуск Chromium и веб-интерфейса в [GitHub Actions](https://github.com/HEXYEBA/hse_domaha/actions/runs/38815238422). [Подробности версии и оставшиеся пункты сдачи](docs/RELEASE_0_1_0.md).
+Проверено: 150 тестов на Windows; сборка Docker, 146 тестов Linux (4 проверки только для Windows пропущены), запуск Chromium и веб-интерфейса в [GitHub Actions](https://github.com/HEXYEBA/review-insights/actions/runs/38815238422). [Подробности версии и оставшиеся пункты сдачи](docs/RELEASE_0_1_0.md).
 
 ## Проблема и зачем нужна LLM
 
@@ -30,8 +30,8 @@
 Откройте PowerShell или терминал:
 
 ```sh
-git clone https://github.com/HEXYEBA/hse_domaha.git
-cd hse_domaha
+git clone https://github.com/HEXYEBA/review-insights.git
+cd review-insights
 docker compose build
 ```
 
@@ -156,7 +156,7 @@ codex login
 docker compose run --rm --no-deps app python -m pytest -q
 ```
 
-[GitHub Actions](https://github.com/HEXYEBA/hse_domaha/actions) собирает образ без авторизации владельца, запускает тесты, проверяет Chromium на локальной HTML-странице и доступность веб-интерфейса. Эти проверки не подтверждают доступность Яндекса и модели для другого аккаунта: их проверяет отдельный реальный запуск.
+[GitHub Actions](https://github.com/HEXYEBA/review-insights/actions) собирает образ без авторизации владельца, запускает тесты, проверяет Chromium на локальной HTML-странице и доступность веб-интерфейса. Эти проверки не подтверждают доступность Яндекса и модели для другого аккаунта: их проверяет отдельный реальный запуск.
 
 ## Структура проекта
 
